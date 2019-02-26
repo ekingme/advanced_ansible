@@ -1,0 +1,6 @@
+- name: Setup SSH on Windows Server
+  hosts: windows
+  vars_files:
+    - ./users_var.yml
+  roles:
+    - win_ad_user
