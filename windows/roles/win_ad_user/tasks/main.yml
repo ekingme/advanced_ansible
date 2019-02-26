@@ -1,4 +1,11 @@
 ---
+- name: Create Windows Domain Group
+  win_domain_group:
+    name: "{{ item.group_name }}"
+    scope: "{{ item.group_scope }}"
+    state: present
+  loop: "{{ user_info }}"
+
 - name: Create Windows Domain Users
   win_domain_user:
     name: "{{ item.name }}"
