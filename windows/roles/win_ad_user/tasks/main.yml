@@ -5,6 +5,6 @@
     firstname: "{{ item.firstname }}"
     surname: "{{ item.surname }}"
     password: "{{ item.password }}"
-    groups: "{{ itemgroup_name }}"
+    groups: "{{ item.group_name }}"
     state: present
   loop: "{{ user_info }}"
