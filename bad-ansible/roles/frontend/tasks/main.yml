@@ -1,0 +1,22 @@
+---
+- name: Install httpie
+  package:
+    name: httpie
+    state: latest
+
+- name: Install HAProxy
+  yum:
+    name: haproxy
+    state: latest
+
+- name: Configure HAProxy
+  template:
+    src: haproxy.cfg.j2
+    dest: /etc/haproxy/haproxy.cfg
+  notify: Restart HAProxy
+
+- name: Start HAProxy and enable at boot
+  service:
+    name: haproxy
+    enabled: yes
+    state: started
