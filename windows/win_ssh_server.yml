@@ -1,0 +1,8 @@
+- name: Install Active Directory on Windows Server
+  hosts: windows
+  vars_files:
+    - ./ssh_var.yml
+  roles:
+    - win_chocolatey
+    - win_service_manage
+    - win_firewall
