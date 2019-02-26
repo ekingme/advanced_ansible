@@ -1,4 +1,4 @@
-- name: Install Active Directory on Windows Server
+- name: Setup SSH on Windows Server
   hosts: windows
   vars_files:
     - ./ssh_var.yml
