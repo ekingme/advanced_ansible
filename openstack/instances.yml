@@ -1,6 +1,7 @@
 - hosts: jumpbox
   roles:
     - provision-instances
+    - osp-facts
 
 - name: deploy frontends
   hosts: frontends

@@ -17,7 +17,8 @@
     userdata: |
       #!/bin/bash
       curl -o /tmp/openstack.pub http://www.opentlc.com/download/ansible_bootcamp/openstack_keys/openstack.pub
-      cat /tmp/openstack.pub >> /home/cloud-user/.ssh/authorized_keys
+      cat /tmp/openstack.pub >> /home/cloud-user/.ssh/authorized_key
+      chmod 600 /home/cloud-user/.ssh/authorized_key
   loop: "{{ instances }}"
   register: instance
 
@@ -34,27 +35,20 @@
     server: "{{ item.server.name }}"
     network: "ext_network"
     timeout: 180
+    wait: true
   loop: "{{ instance.results }}"
   register: floatingip
 
 - name: debug floating ip
   debug:
-    msg: "Floating IP: {{ item }}"
+    msg: "Instance Name: {{ item.invocation.module_args.server }}, Floating IP: {{ item.floating_ip.floating_ip_address }}"
   loop: "{{ floatingip.results }}"
 
 - name: Wait for SSH to come up
   wait_for:
-    host: "{{ item.item.openstack.addresses.ext_network[0].addr }}"
+    host: "{{ item.floating_ip.floating_ip_address }}" 
     port: 22
     search_regex: OpenSSH
     timeout: 600
   delegate_to: "{{ inventory_hostname }}"
   loop: "{{ floatingip.results }}"
-
-- name: add hosts to in memory inventory
-  add_host:
-    name: "{{ item.server.name }}"
-    ansible_ssh_host: "{{ item.server.addresses.ext_network[0].addr }}"
-    groups: "{{ item.server.metadata.group }}, {{ item.server.metadata.deployment }}"
-  loop: "{{ instance.results }}"
-
