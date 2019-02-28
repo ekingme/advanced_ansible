@@ -1,0 +1,24 @@
+- hosts: jumpbox
+  roles:
+    - provision-instances
+
+- name: deploy frontends
+  hosts: frontends
+  become: true
+  roles:
+    - common
+    - frontend
+
+- name: deploy application servers
+  hosts: apps
+  become: true
+  roles:
+    - common
+    - application
+
+- name: deploy database servers
+  hosts: appdbs
+  become: true
+  roles:
+    - common
+    - database

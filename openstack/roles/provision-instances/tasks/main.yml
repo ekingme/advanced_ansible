@@ -1,0 +1,60 @@
+---
+# tasks file for provision-instances
+- name: Create a new instance
+  os_server:
+    cloud: ospcloud
+    state: present
+    name: "{{ item.name }}"
+    image: "{{ item.image }}"
+    key_name: "{{ item.keypair }}"
+    flavor: "{{ item.flavor }}"
+    security_groups: "{{ item.security_group }}"
+    nics:
+      - net-name: "int_network"
+    meta:
+      group: "{{ item.group }}"
+      deployment: "{{ item.deployment }}"
+    userdata: |
+      #!/bin/bash
+      curl -o /tmp/openstack.pub http://www.opentlc.com/download/ansible_bootcamp/openstack_keys/openstack.pub
+      cat /tmp/openstack.pub >> /home/cloud-user/.ssh/authorized_keys
+  loop: "{{ instances }}"
+  register: instance
+
+- name: Show server data
+  debug:
+    msg: "Instance Name: {{ item.server.name }}; Instance IP: {{ item.server.addresses.int_network[0].addr }}"
+  loop: "{{ instance.results }}"
+
+- name: Add floating IP to server
+  os_floating_ip:
+    cloud: ospcloud
+    state: present
+    reuse: yes
+    server: "{{ item.server.name }}"
+    network: "ext_network"
+    timeout: 180
+  loop: "{{ instance.results }}"
+  register: floatingip
+
+- name: debug floating ip
+  debug:
+    msg: "Floating IP: {{ item }}"
+  loop: "{{ floatingip.results }}"
+
+- name: Wait for SSH to come up
+  wait_for:
+    host: "{{ item.item.openstack.addresses.ext_network[0].addr }}"
+    port: 22
+    search_regex: OpenSSH
+    timeout: 600
+  delegate_to: "{{ inventory_hostname }}"
+  loop: "{{ floatingip.results }}"
+
+- name: add hosts to in memory inventory
+  add_host:
+    name: "{{ item.server.name }}"
+    ansible_ssh_host: "{{ item.server.addresses.ext_network[0].addr }}"
+    groups: "{{ item.server.metadata.group }}, {{ item.server.metadata.deployment }}"
+  loop: "{{ instance.results }}"
+

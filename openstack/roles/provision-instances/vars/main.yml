@@ -1,0 +1,7 @@
+---
+# vars file for provision-instances
+instances:
+  - { name: 'app1',     flavor: 'm2.small', keypair: 'ansible_ssh', image: 'rhel-guest', group: 'apps',        deployment: 'QA',  security_group: 'apps',     net1: 'ext_network', net2: 'int_network' }
+  - { name: 'app2',     flavor: 'm2.small', keypair: 'ansible_ssh', image: 'rhel-guest', group: 'apps',        deployment: 'QA',  security_group: 'apps',     net1: 'ext_network', net2: 'int_network' }
+  - { name: 'db',       flavor: 'm2.small', keypair: 'ansible_ssh', image: 'rhel-guest', group: 'appdbs',     deployment: 'QA',  security_group: 'db',       net1: 'ext_network', net2: 'int_network' }
+  - { name: 'frontend', flavor: 'm2.small', keypair: 'ansible_ssh', image: 'rhel-guest', group: 'frontends',  deployment: 'QA',  security_group: 'frontend', net1: 'ext_network', net2: 'int_network' }
