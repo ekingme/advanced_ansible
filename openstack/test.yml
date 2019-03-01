@@ -1,12 +1,24 @@
 - hosts: jumpbox
+  roles:
+    - osp-facts
 
-  tasks:
-  - name: get openstack instance info
-    os_server_facts:
-      cloud: ospcloud
-      region_name: RegionOne
-    register: result
+- name: deploy frontends
+  hosts: frontends
+  become: true
+  roles:
+    - common
+    - frontend
 
-  - name: debug
-    debug:
-      msg: "Debug output: {{ result }}"
+- name: deploy application servers
+  hosts: apps
+  become: true
+  roles:
+    - common
+    - application
+
+- name: deploy database servers
+  hosts: appdbs
+  become: true
+  roles:
+    - common
+    - database
